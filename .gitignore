@@ -47,5 +47,8 @@ Thumbs.db
 .runtimeconfig.json
 src/app/firebase.config.ts
 
-# Costum
+# Linux
 /.directory
+
+# Environments files
+.env
