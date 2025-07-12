@@ -2,13 +2,50 @@
 
 function todoApp() {
   this.container = "";
-  this.mode = "list";
+  // this.mode = "list";
+  this.mode = "guest"; // start in guest mode
+  this.guestStarted = false;
   this.currentTodo = {};
 
   this.init = function () {
     this.container = document.querySelector("#content");
-    this.printBtn();
-    this.getAllTodos();
+    this.container.innerHTML = "";
+
+    if (!this.guestStarted) {
+      // Show guest button
+      this.printGuestStart();
+    } else if (this.mode === "list") {
+      this.printBtn();
+      this.getAllTodos();
+    } else if (this.mode === "form") {
+      this.printBtn();
+      this.printForm();
+    }
+
+    // this.printBtn();
+    // this.getAllTodos();
+  };
+
+  this.printGuestStart = function () {
+    const html = `
+      <div style="text-align:center; margin-top:2rem;">
+        <button class="btn-todo btn-guest" id="btn-guest">Als Gast starten</button>
+      </div>
+    `;
+    this.container.insertAdjacentHTML("beforeend", html);
+    const btn = this.container.querySelector("#btn-guest");
+    btn.addEventListener("click", () => {
+      this.guestStarted = true;
+      this.mode = "list";
+      // Trigger initial request to set cookie
+      this.apiHandler("https://api-notes.dev2k.space/api", "GET")
+        .then(() => {
+          this.init();
+        })
+        .catch((err) => {
+          console.error("Fehler beim Gastzugang:", err);
+        });
+    });
   };
 
   this.resetCurrentTodo = function () {
@@ -23,16 +60,22 @@ function todoApp() {
   this.changeMode = function (mode) {
     this.mode = mode;
     this.container.innerHTML = "";
-    this.printBtn();
-
-    if (this.mode === "list") {
-      this.getAllTodos();
-    }
-
-    if (this.mode === "form") {
-      this.printForm();
-    }
+    this.init();
   };
+
+  // this.changeMode = function (mode) {
+  //   this.mode = mode;
+  //   this.container.innerHTML = "";
+  //   this.printBtn();
+
+  //   if (this.mode === "list") {
+  //     this.getAllTodos();
+  //   }
+
+  //   if (this.mode === "form") {
+  //     this.printForm();
+  //   }
+  // };
 
   // ============================================================
   // ============================================================
@@ -280,11 +323,13 @@ function todoApp() {
 
   this.getAllTodos = function () {
     // this.apiHandler("http://localhost:3000/api/todos", "GET").then((json) => {
-    this.apiHandler("https://api-notes.dev2k.space/api/todos", "GET").then((json) => {
-      for (let i = 0; i < json.length; i++) {
-        this.printTodo(json[i]);
+    this.apiHandler("https://api-notes.dev2k.space/api/todos", "GET").then(
+      (json) => {
+        for (let i = 0; i < json.length; i++) {
+          this.printTodo(json[i]);
+        }
       }
-    });
+    );
   };
 
   this.getTodo = function (data) {
@@ -329,10 +374,40 @@ function todoApp() {
   // ============================================================
   // ================ API handler ===============================
 
+  // this.apiHandler = function (url, method, data = null) {
+  //   const options = {
+  //     method: method,
+  //     cache: "no-cache",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   };
+
+  //   if (data !== null) {
+  //     options.body = JSON.stringify(data);
+  //   }
+
+  //   return fetch(url, options)
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Netzwerkantwort war nicht ok");
+  //       }
+  //       return response.json();
+  //     })
+  //     .catch((error) => {
+  //       console.error("Fehler bei API-Anfrage:", error);
+  //       throw error;
+  //     });
+  // };
+
+  /**
+   * API handler mit Cookie-Support
+   */
   this.apiHandler = function (url, method, data = null) {
     const options = {
       method: method,
       cache: "no-cache",
+      credentials: "include", // send cookies
       headers: {
         "Content-Type": "application/json",
       },
@@ -344,9 +419,7 @@ function todoApp() {
 
     return fetch(url, options)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Netzwerkantwort war nicht ok");
-        }
+        if (!response.ok) throw new Error("Netzwerkantwort war nicht ok");
         return response.json();
       })
       .catch((error) => {
@@ -356,7 +429,7 @@ function todoApp() {
   };
 }
 
-// ============================================================
+// ==================== DOM ready =============================
 
 document.addEventListener("DOMContentLoaded", function () {
   const todoAppInstance = new todoApp();
