@@ -1,12 +1,11 @@
+// todoApp.js
 "use strict";
 
-// const API_BASE = window.location.origin + "/api";
-// this.apiHandler(`${API_BASE}/todos`, "GET");
+const API_BASE = "https://restful-guest-access.dev2k.space/api";
 
 function todoApp() {
   this.container = "";
-  // this.mode = "list";
-  this.mode = "guest"; // start in guest mode
+  this.mode = "guest";
   this.guestStarted = false;
   this.currentTodo = {};
 
@@ -24,9 +23,6 @@ function todoApp() {
       this.printBtn();
       this.printForm();
     }
-
-    // this.printBtn();
-    // this.getAllTodos();
   };
 
   this.printGuestStart = function () {
@@ -41,7 +37,7 @@ function todoApp() {
       this.guestStarted = true;
       this.mode = "list";
       // Trigger initial request to set cookie
-      this.apiHandler("https://restful-guest-access.dev2k.space/api", "GET")
+      this.apiHandler(API_BASE, "GET")
         .then(() => {
           this.init();
         })
@@ -65,20 +61,6 @@ function todoApp() {
     this.container.innerHTML = "";
     this.init();
   };
-
-  // this.changeMode = function (mode) {
-  //   this.mode = mode;
-  //   this.container.innerHTML = "";
-  //   this.printBtn();
-
-  //   if (this.mode === "list") {
-  //     this.getAllTodos();
-  //   }
-
-  //   if (this.mode === "form") {
-  //     this.printForm();
-  //   }
-  // };
 
   // ============================================================
   // ============================================================
@@ -325,11 +307,7 @@ function todoApp() {
   // ============================================================
 
   this.getAllTodos = function () {
-    // this.apiHandler("http://localhost:3000/api/todos", "GET").then((json) => {
-    this.apiHandler(
-      "https://restful-guest-access.dev2k.space/api/todos",
-      "GET"
-    ).then((json) => {
+    this.apiHandler(`${API_BASE}/todos`, "GET").then((json) => {
       for (let i = 0; i < json.length; i++) {
         this.printTodo(json[i]);
       }
@@ -337,72 +315,37 @@ function todoApp() {
   };
 
   this.getTodo = function (data) {
-    return this.apiHandler(
-      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
-      "GET"
-    ).then((json) => {
-      return json;
-    });
+    return this.apiHandler(`${API_BASE}/todos/${data.id}`, "GET").then(
+      (json) => {
+        return json;
+      }
+    );
   };
 
   this.createTodo = function (data) {
-    return this.apiHandler(
-      "https://restful-guest-access.dev2k.space/api/todos",
-      "POST",
-      data
-    ).then((json) => {
+    return this.apiHandler(`${API_BASE}/todos`, "POST", data).then((json) => {
       return json;
     });
   };
 
   this.updateTodo = function (data) {
-    return this.apiHandler(
-      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
-      "PATCH",
-      data
-    ).then((json) => {
-      return json;
-    });
+    return this.apiHandler(`${API_BASE}/todos/${data.id}`, "PATCH", data).then(
+      (json) => {
+        return json;
+      }
+    );
   };
 
   this.deleteTodo = function (data) {
-    return this.apiHandler(
-      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
-      "DELETE",
-      data
-    ).then((json) => {
-      return json;
-    });
+    return this.apiHandler(`${API_BASE}/todos/${data.id}`, "DELETE", data).then(
+      (json) => {
+        return json;
+      }
+    );
   };
 
   // ============================================================
   // ================ API handler ===============================
-
-  // this.apiHandler = function (url, method, data = null) {
-  //   const options = {
-  //     method: method,
-  //     cache: "no-cache",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   };
-
-  //   if (data !== null) {
-  //     options.body = JSON.stringify(data);
-  //   }
-
-  //   return fetch(url, options)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Netzwerkantwort war nicht ok");
-  //       }
-  //       return response.json();
-  //     })
-  //     .catch((error) => {
-  //       console.error("Fehler bei API-Anfrage:", error);
-  //       throw error;
-  //     });
-  // };
 
   /**
    * API handler mit Cookie-Support
