@@ -1,5 +1,8 @@
 "use strict";
 
+// const API_BASE = window.location.origin + "/api";
+// this.apiHandler(`${API_BASE}/todos`, "GET");
+
 function todoApp() {
   this.container = "";
   // this.mode = "list";
@@ -323,13 +326,14 @@ function todoApp() {
 
   this.getAllTodos = function () {
     // this.apiHandler("http://localhost:3000/api/todos", "GET").then((json) => {
-    this.apiHandler("https://restful-guest-access.dev2k.space/api/todos", "GET").then(
-      (json) => {
-        for (let i = 0; i < json.length; i++) {
-          this.printTodo(json[i]);
-        }
+    this.apiHandler(
+      "https://restful-guest-access.dev2k.space/api/todos",
+      "GET"
+    ).then((json) => {
+      for (let i = 0; i < json.length; i++) {
+        this.printTodo(json[i]);
       }
-    );
+    });
   };
 
   this.getTodo = function (data) {
