@@ -38,7 +38,7 @@ function todoApp() {
       this.guestStarted = true;
       this.mode = "list";
       // Trigger initial request to set cookie
-      this.apiHandler("https://api-notes.dev2k.space/api", "GET")
+      this.apiHandler("https://restful-guest-access.dev2k.space/api", "GET")
         .then(() => {
           this.init();
         })
@@ -323,7 +323,7 @@ function todoApp() {
 
   this.getAllTodos = function () {
     // this.apiHandler("http://localhost:3000/api/todos", "GET").then((json) => {
-    this.apiHandler("https://api-notes.dev2k.space/api/todos", "GET").then(
+    this.apiHandler("https://restful-guest-access.dev2k.space/api/todos", "GET").then(
       (json) => {
         for (let i = 0; i < json.length; i++) {
           this.printTodo(json[i]);
@@ -334,7 +334,7 @@ function todoApp() {
 
   this.getTodo = function (data) {
     return this.apiHandler(
-      `https://api-notes.dev2k.space/api/todos/${data.id}`,
+      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
       "GET"
     ).then((json) => {
       return json;
@@ -343,7 +343,7 @@ function todoApp() {
 
   this.createTodo = function (data) {
     return this.apiHandler(
-      "https://api-notes.dev2k.space/api/todos",
+      "https://restful-guest-access.dev2k.space/api/todos",
       "POST",
       data
     ).then((json) => {
@@ -353,7 +353,7 @@ function todoApp() {
 
   this.updateTodo = function (data) {
     return this.apiHandler(
-      `https://api-notes.dev2k.space/api/todos/${data.id}`,
+      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
       "PATCH",
       data
     ).then((json) => {
@@ -363,7 +363,7 @@ function todoApp() {
 
   this.deleteTodo = function (data) {
     return this.apiHandler(
-      `https://api-notes.dev2k.space/api/todos/${data.id}`,
+      `https://restful-guest-access.dev2k.space/api/todos/${data.id}`,
       "DELETE",
       data
     ).then((json) => {
