@@ -1,7 +1,7 @@
 // todoApp.js
 "use strict";
 
-const API_BASE = "https://restful-guest-access.dev2k.space/api";
+const API_BASE = "https://restful-guest-access.dev2k.space/api/";
 
 function todoApp() {
   this.container = "";
@@ -13,8 +13,22 @@ function todoApp() {
     this.container = document.querySelector("#content");
     this.container.innerHTML = "";
 
+    // 1) Cookie auslesen
+    const guestCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("guestId="));
+
+    // 2) Wenn Cookie da ist, Gast‑Modus aktivieren
+    if (guestCookie) {
+      this.guestStarted = true;
+      this.mode = this.mode === "guest" ? "list" : this.mode;
+    }
+
+    // 3) Gast‑ID anzeigen (falls gesetzt)
+    this.showGuestCookie();
+
+    // 4) UI bauen
     if (!this.guestStarted) {
-      // Show guest button
       this.printGuestStart();
     } else if (this.mode === "list") {
       this.printBtn();
@@ -25,25 +39,37 @@ function todoApp() {
     }
   };
 
+  this.showGuestCookie = function () {
+    const guestCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("guestId="));
+    if (guestCookie) {
+      const guestId = guestCookie.split("=")[1];
+      this.container.insertAdjacentHTML(
+        "beforeend",
+        `<p style="font-size:0.8rem; color:#666">Gast‑Session: ${guestId}</p>`
+      );
+    }
+  };
+
   this.printGuestStart = function () {
     const html = `
-      <div style="text-align:center; margin-top:2rem;">
-        <button class="btn-todo btn-guest" id="btn-guest">Als Gast starten</button>
-      </div>
-    `;
+    <div style="text-align:center; margin-top:2rem;">
+      <button class="btn-todo btn-guest" id="btn-guest">Als Gast starten</button>
+    </div>
+  `;
     this.container.insertAdjacentHTML("beforeend", html);
     const btn = this.container.querySelector("#btn-guest");
     btn.addEventListener("click", () => {
-      this.guestStarted = true;
-      this.mode = "list";
-      // Trigger initial request to set cookie
+      // 1) Einmalig Cookie auf Server anfordern
       this.apiHandler(API_BASE, "GET")
         .then(() => {
+          // 2) Nun ist cookie gesetzt → Frontend neu initialisieren
+          this.guestStarted = true;
+          this.mode = "list";
           this.init();
         })
-        .catch((err) => {
-          console.error("Fehler beim Gastzugang:", err);
-        });
+        .catch(console.error);
     });
   };
 
@@ -60,6 +86,11 @@ function todoApp() {
     this.mode = mode;
     this.container.innerHTML = "";
     this.init();
+
+    // Immer beim Listenmodus die Todos neu laden
+    if (mode === "list") {
+      this.getAllTodos();
+    }
   };
 
   // ============================================================
@@ -351,6 +382,9 @@ function todoApp() {
    * API handler mit Cookie-Support
    */
   this.apiHandler = function (url, method, data = null) {
+    // doppelte Slashes verhindern
+    url = url.replace(/([^:]\/)\/+/g, "$1");
+
     const options = {
       method: method,
       cache: "no-cache",
