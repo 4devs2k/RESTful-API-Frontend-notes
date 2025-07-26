@@ -1,7 +1,7 @@
 // todoApp.js
 "use strict";
 
-const API_BASE = "https://restful-guest-access.dev2k.space/api/";
+const API_BASE = "/api/";
 
 function todoApp() {
   this.container = "";
